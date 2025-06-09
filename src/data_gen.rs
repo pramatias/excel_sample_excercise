@@ -15,6 +15,8 @@ use fake::Rng;
 use fake::rand::prelude::SliceRandom;
 use quick_xml::Error as XmlError;
 
+use crate::utils::Record;
+
 #[derive(Debug, Error)]
 pub enum WriteError {
     #[error("XML error: {0}")]
@@ -32,18 +34,6 @@ impl From<XlsxError> for WriteError {
     fn from(e: XlsxError) -> Self {
         WriteError::Xlsx(e)
     }
-}
-
-#[derive(Debug, serde::Serialize)]
-pub struct Record {
-    id: Uuid,
-    region: String,
-    municipality: String,
-    company: String,
-    phone: String,
-    contact: String,
-    total_order: u32,
-    recent_order: u32,
 }
 
 pub fn write_records(path: &Path, records: &[Record]) -> Result<(), WriteError> {
