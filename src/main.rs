@@ -1,13 +1,36 @@
 mod data_gen;
 mod utils;
 
+// use anyhow::{Context, Result};
+use anyhow::Result;
+use clap::{ArgAction, Args, Parser, Subcommand};
+use log::{LevelFilter, debug};
 use std::path::PathBuf;
 
 use crate::data_gen::{WriteError, generate_records, write_records};
+use init::initialize_logger;
 
-/// CLI for record generation
+/// CLI for record generation and reading
 #[derive(Parser, Debug)]
-#[command(name = "record-gen")]
+#[command(name = "record-gen", version = "0.1.0", author = "Your Name", about = "Generate or read records")]
+struct Cli {
+    #[command(flatten)]
+    verbose: Verbosity,
+
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+    /// Generate records
+    Gen(GenArgs),
+    /// Read records from a file
+    Read(ReadArgs),
+}
+
+/// Arguments for `gen` subcommand
+#[derive(Args, Debug)]
 struct GenArgs {
     /// Output file path
     #[arg(short = 'o', long = "output", help = "Output file path")]
@@ -16,6 +39,31 @@ struct GenArgs {
     /// Number of records to generate
     #[arg(short = 'n', long = "count", help = "Number of records", default_value_t = 10000)]
     count: u32,
+}
+
+/// Arguments for `read` subcommand
+#[derive(Args, Debug)]
+struct ReadArgs {
+    /// Path to the file to read
+    #[arg(help = "File to read")]
+    file: String,
+}
+
+fn main() -> Result<()> {
+    // Parse CLI args
+    let cli = Cli::parse();
+
+    // Initialize logger
+    let level = cli.verbose.log_level_filter();
+    initialize_logger(level)?;
+
+    // Dispatch subcommands
+    match cli.command {
+        Commands::Gen(args) => run_gen(args)?,
+        Commands::Read(args) => run_read(args)?,
+    }
+
+    Ok(())
 }
 
 fn run_gen(args: GenArgs) -> Result<(), WriteError> {
@@ -34,5 +82,38 @@ fn run_gen(args: GenArgs) -> Result<(), WriteError> {
     Ok(())
 }
 
-fn main() -> Result<(), WriteError> {
+/// Run the `read` command: read and display records
+fn run_read(args: ReadArgs) -> Result<()> {
+    log::debug!("Reading records from {}", args.file);
+    // let data = read_records(&args.file)?;
+    // Display or process the data as needed
+    // println!("Read {} records from {}", data.len(), args.file);
+
+    Ok(())
+}
+
+/// Configure logging verbosity using -v/--verbose and -q/--quiet flags.
+#[derive(Args, Debug)]
+pub struct Verbosity {
+    /// Increase the level of verbosity (repeatable).
+    #[arg(short = 'v', long, action = ArgAction::Count, display_order = 99)]
+    pub verbose: u8,
+
+    /// Decrease the level of verbosity (repeatable).
+    #[arg(short = 'q', long, action = ArgAction::Count, display_order = 100)]
+    pub quiet: u8,
+}
+
+impl Verbosity {
+    pub fn log_level_filter(&self) -> LevelFilter {
+        if self.quiet > 0 {
+            LevelFilter::Warn
+        } else {
+            match self.verbose {
+                0 => LevelFilter::Info,
+                1 => LevelFilter::Debug,
+                _ => LevelFilter::Trace,
+            }
+        }
+    }
 }
