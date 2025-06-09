@@ -22,5 +22,6 @@ thiserror = "2.0.12"
 
 init = { version = "0.1", path = "./init"}
 calamine = "0.27.0"
+prettytable = "0.10.0"
 [patch.crates-io]
 calamine = { git = "https://github.com/prophittcorey/calamine", branch = "fix/zip-3.0" }
