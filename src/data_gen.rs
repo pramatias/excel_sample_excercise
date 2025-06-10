@@ -7,11 +7,8 @@ use std::path::Path;
 use uuid::Uuid;
 use thiserror::Error;
 
-// Import the xlsx writer and its error type
 use umya_spreadsheet::{new_file_empty_worksheet, Worksheet};
 use umya_spreadsheet::helper::coordinate::CellCoordinates;
-// use umya_spreadsheet::writer::xlsx::XlsxError;
-// use umya_spreadsheet::structs::error::XlsxError;
 use umya_spreadsheet::XlsxError;
 use fake::rand;
 use fake::Rng;

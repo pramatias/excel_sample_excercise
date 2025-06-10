@@ -1,0 +1,136 @@
+#+TITLE: record-gen — Record Generator and Reader CLI
+#+AUTHOR: pramatias
+#+DATE: 2025-06-10
+#+DESCRIPTION: A Rust CLI tool to generate synthetic record Excel files and read/display them.
+#+KEYWORDS: rust, cli, excel, record generation, excel-reading, automation
+#+LANGUAGE: en
+#+OPTIONS: toc:nil
+
+* Table of Contents
+- [[#overview][Overview]]
+- [[#installation][Installation]]
+- [[#configuration][Configuration]]
+- [[#commands][Commands]]
+  - [[#gen][Gen]]
+  - [[#read][Read]]
+  - [[#help][Help]]
+- [[#usage-examples][Usage Examples]]
+- [[#license][License]]
+
+* Overview                                                                     :overview:
+`record-gen` is a command‑line utility for generating synthetic datasets and reading them back from Excel files.
+It provides two main subcommands:
+
+  - **Gen**: Produce an `.xlsx` file populated with randomly generated records.
+  - **Read**: Load an existing spreadsheet and pretty‑print its contents to the console.
+
+Under the hood, it uses:
+
+  - `clap` for CLI argument parsing
+  - `log` + `env_logger` (via `initialize_logger`) for adjustable verbosity
+  - `calamine` or similar for Excel I/O (wrapped in `ExcelReader`)
+
+This tool is ideal for testing, demos, or any scenario where you need a quick batch of sample data in a spreadsheet.
+
+* Installation                                                                 :installation:
+From crates.io (when published):
+
+#+BEGIN_SRC bash
+cargo install record-gen
+#+END_SRC
+
+From GitHub source (latest development version):
+
+#+BEGIN_SRC bash
+git clone https://github.com/pramatias/excel_sample_excercise.git
+cd excel_sample_excercise
+cargo install --path .
+#+END_SRC
+
+Requirements:
+
+  - Rust toolchain ≥ 1.60
+  - `cargo` in your PATH
+
+* Configuration                                                                 :configuration:
+No additional configuration files are needed. You may control logging behavior via CLI flags:
+
+  - `-v` / `--verbose` (repeatable) to increase output verbosity
+  - `-q` / `--quiet` (repeatable) to suppress non‑error messages
+
+* Commands                                                                      :commands:
+
+** Gen                                                                        :gen:
+Generate a new Excel file of synthetic records.
+
+#+BEGIN_SRC bash
+record-gen gen [OPTIONS]
+#+END_SRC
+
+Options:
+
+  - `-n`, `--count <COUNT>`    Number of records to generate (default: 10000)
+  - `-o`, `--output <PATH>`    Output file path (default: `records.xlsx`)
+  - `-v`, `--verbose`          Increase logging verbosity (repeatable)
+  - `-q`, `--quiet`            Decrease logging verbosity (repeatable)
+
+On success, prints:
+
+#+BEGIN_EXAMPLE
+Generated 10000 records to "records.xlsx"
+#+END_EXAMPLE
+
+** Read                                                                       :read:
+Read and display records from an existing file.
+
+#+BEGIN_SRC bash
+record-gen read <FILE>
+#+END_SRC
+
+Arguments:
+
+  - `<FILE>`    Path to the `.xlsx` file to read
+
+Example:
+
+#+BEGIN_EXAMPLE
+record-gen read records.xlsx
+#=> Successfully read 10000 records from records.xlsx
+#=> [pretty‑printed table of first few rows …]
+#+END_EXAMPLE
+
+** Help                                                                       :help:
+Prints global help or subcommand‑specific help:
+
+#+BEGIN_SRC bash
+record-gen --help
+record-gen gen --help
+record-gen read --help
+#+END_SRC
+
+* Usage Examples                                                              :usage-examples:
+
+** Generate 5,000 records with default name
+
+#+BEGIN_SRC bash
+record-gen gen -n 5000
+#+END_SRC
+
+** Generate 2,000 records into a custom file
+
+#+BEGIN_SRC bash
+record-gen gen -n 2000 -o sample_data.xlsx
+#+END_SRC
+
+** Read the generated file
+
+#+BEGIN_SRC bash
+record-gen read sample_data.xlsx
+#+END_SRC
+
+[[./assets/read_output.png]]   ; screenshot of pretty‑print output
+
+* License                                                                      :license:
+MIT License
+
+See the full text in the `LICENSE` file at the root of this repository.
