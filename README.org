@@ -21,8 +21,8 @@
 `eu_excel_generator` is a command‑line utility for generating synthetic datasets and reading them back from Excel files.
 It provides two main subcommands:
 
-  - **Gen**: Produce an `.xlsx` file populated with randomly generated records.
-  - **Read**: Load an existing spreadsheet and pretty‑print its contents to the console.
+  - *Gen*: Produce an `.xlsx` file populated with randomly generated records.
+  - *Read*: Load an existing spreadsheet and pretty‑print its contents to the console.
 
 * Installation :installation:
 
