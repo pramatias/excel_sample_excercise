@@ -8,8 +8,11 @@ use uuid::Uuid;
 use thiserror::Error;
 
 // Import the xlsx writer and its error type
-use umya_spreadsheet::{new_file, Worksheet};
-use umya_spreadsheet::writer::xlsx::XlsxError;
+use umya_spreadsheet::{new_file_empty_worksheet, Worksheet};
+use umya_spreadsheet::helper::coordinate::CellCoordinates;
+// use umya_spreadsheet::writer::xlsx::XlsxError;
+// use umya_spreadsheet::structs::error::XlsxError;
+use umya_spreadsheet::XlsxError;
 use fake::rand;
 use fake::Rng;
 use fake::rand::prelude::SliceRandom;
@@ -37,20 +40,22 @@ impl From<XlsxError> for WriteError {
 }
 
 pub fn write_records(path: &Path, records: &[Record]) -> Result<(), WriteError> {
-    let mut wb = new_file();
+    let mut wb = new_file_empty_worksheet();
     let ws: &mut Worksheet = wb
         .new_sheet("Eu_Data")
         .map_err(WriteError::Sheet)?;
 
-    // Helper to write a row
+    // Helper to write a row - now uses proper CellCoordinates
     fn write_row(ws: &mut Worksheet, row: u32, vals: &[&str]) {
         for (col, v) in vals.iter().enumerate() {
-            ws.get_cell_by_column_and_row_mut((col + 1) as u32, row)
-              .set_value(*v);
+            let col_index = (col + 1) as u32;
+            // Create CellCoordinates from (column, row)
+            let coord = CellCoordinates::from((col_index, row));
+            ws.get_cell_mut(coord).set_value(*v);
         }
     }
 
-    // Header (now includes TotalOrder and RecentOrder)
+    // Header
     write_row(
         ws,
         1,
